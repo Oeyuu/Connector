@@ -20,18 +20,20 @@ resource "aws_mskconnect_connector" "connector" {
   }
 
   connector_configuration = {
-    "connector.class"                   = "io.confluent.connect.s3.S3SinkConnector"
-    "s3.region"                         = aws_s3_bucket.s3sink.region
-    "format.class"                      = "io.confluent.connect.s3.format.json.JsonFormat"
-    "flush.size"                        = "1"
-    "schema.compatibility"              = "NONE"
-    "partioner.class"                   = "io.confluent.connect.storage.partitioner.DefaultPartitioner"
-    "storage.class"                     = "io.confluent.connect.s3.storage.S3Storage"
-    "s3.bucket.name"                    = aws_s3_bucket.s3sink.id
-    "tasks.max"                         = "1"
+    "connector.class"                   = var.connector_configuration.connector_class
+    "s3.region"                         = var.connector_configuration.s3_region
+    "format.class"                      =  var.connector_configuration.format_class
+    "flush.size"                        =  var.connector_configuration.flush_size
+    "schema.compatibility"              =  var.connector_configuration.schema_compatibility
+    "partioner.class"                   =  var.connector_configuration.partioner_class
+    "storage.class"                     =  var.connector_configuration.storage_class
+    "s3.bucket.name"                    =  var.connector_configuration.s3_bucket_name
+    "tasks.max"                         =  var.connector_configuration.tasks_max
     "topics"                            = data.external.kafka_topics_list.result["output"]
     "confluent.topic.bootstrap.servers" = data.aws_msk_cluster.msk_cluster.bootstrap_brokers_sasl_iam
   }
+
+
 
   kafka_cluster {
     apache_kafka_cluster {
@@ -78,9 +80,8 @@ resource "aws_mskconnect_custom_plugin" "connector_install" {
   content_type = upper(var.distribution_content_type)
   location {
     s3 {
-      bucket_arn = aws_s3_bucket.distributions.arn
+      bucket_arn = data.aws_s3_bucket.distributions.arn
       file_key   = aws_s3_object.connector_distribution.key
-      #file_key = "s3sink/10.5.1.zip"
     }
   }
 }

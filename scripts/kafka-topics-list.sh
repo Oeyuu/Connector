@@ -13,9 +13,8 @@ desired_topics=()
 
 # Schleife durch alle Topics
 for topic in $topics
-do
-    # Überprüfen, ob das Topic "__amazon_msk_canary" ist
-    if [[ $topic != *"__amazon_msk_canary"* ]]
+do 
+    if [[ $topic != *"__amazon_msk_"* &&  $topic != "__consumer_offsets" ]]
     then
         # Topic zur Liste der gewünschten Topics hinzufügen
         desired_topics+=("$topic")

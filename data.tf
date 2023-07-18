@@ -6,6 +6,10 @@ data "aws_iam_role" "super_user" {
   name = var.iam_role_name
 }
 
+data "aws_s3_bucket" "distributions" {
+  bucket = var.s3_bucket_distributions
+}
+
 data "aws_security_groups" "msk_sg" {
   tags = {
     ClusterName = var.msk_cluster_name
