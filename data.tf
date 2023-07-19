@@ -26,10 +26,6 @@ data "aws_subnets" "private" {
   }
 }
 
-data "external" "kafka_topics_list" {
-  program = ["/bin/bash", "${path.module}/scripts/kafka-topics-list.sh", data.aws_msk_cluster.msk_cluster.bootstrap_brokers_public_sasl_iam]
-}
-
 data "aws_region" "current" {
   name = var.region
 }

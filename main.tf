@@ -1,7 +1,7 @@
 resource "aws_mskconnect_connector" "connector" {
-  name = var.connector_name
+  name = var.connectors[0].name
 
-  kafkaconnect_version = var.kafkaconnect_version
+  kafkaconnect_version = var.connectors[0].kafkaconnect_version
 
   capacity {
     autoscaling {
@@ -19,19 +19,20 @@ resource "aws_mskconnect_connector" "connector" {
     }
   }
 
-  connector_configuration = {
-    "connector.class"                   = var.connector_configuration.connector_class
-    "s3.region"                         = var.connector_configuration.s3_region
-    "format.class"                      =  var.connector_configuration.format_class
-    "flush.size"                        =  var.connector_configuration.flush_size
-    "schema.compatibility"              =  var.connector_configuration.schema_compatibility
-    "partioner.class"                   =  var.connector_configuration.partioner_class
-    "storage.class"                     =  var.connector_configuration.storage_class
-    "s3.bucket.name"                    =  var.connector_configuration.s3_bucket_name
-    "tasks.max"                         =  var.connector_configuration.tasks_max
-    "topics"                            = data.external.kafka_topics_list.result["output"]
-    "confluent.topic.bootstrap.servers" = data.aws_msk_cluster.msk_cluster.bootstrap_brokers_sasl_iam
-  }
+  # connector_configuration = {
+  #   "connector.class"                   = var.connector_configuration.connector_class
+  #   "s3.region"                         = var.connector_configuration.s3_region
+  #   "format.class"                      =  var.connector_configuration.format_class
+  #   "flush.size"                        =  var.connector_configuration.flush_size
+  #   "schema.compatibility"              =  var.connector_configuration.schema_compatibility
+  #   "partioner.class"                   =  var.connector_configuration.partioner_class
+  #   "storage.class"                     =  var.connector_configuration.storage_class
+  #   "s3.bucket.name"                    =  var.connector_configuration.s3_bucket_name
+  #   "tasks.max"                         =  var.connector_configuration.tasks_max
+  #   "topics"                            = data.external.kafka_topics_list.result["output"]
+  #   "confluent.topic.bootstrap.servers" = data.aws_msk_cluster.msk_cluster.bootstrap_brokers_sasl_iam
+  # }
+  connector_configuration = var.connectors[0].connector_configuration
 
 
 
@@ -75,8 +76,8 @@ resource "aws_mskconnect_connector" "connector" {
 
 resource "aws_mskconnect_custom_plugin" "connector_install" {
   depends_on   = [aws_s3_object.connector_distribution]
-  name         = var.connector_name
-  description  = var.connector_description
+  name         = var.connectors[0].name
+  description  = ""
   content_type = upper(var.distribution_content_type)
   location {
     s3 {
